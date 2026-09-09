@@ -77,6 +77,23 @@ def test_duplicate_signup_returns_bad_request(client):
     assert response.json()["detail"] == "Student already signed up for this activity"
 
 
+def test_signup_fails_when_activity_is_full(client):
+    # Arrange
+    activity_name = "Chess Club"
+    email = "student@example.com"
+    activities[activity_name]["max_participants"] = len(activities[activity_name]["participants"])
+
+    # Act
+    response = client.post(
+        f"/activities/{activity_name}/signup",
+        params={"email": email},
+    )
+
+    # Assert
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Activity is full"
+
+
 def test_unregister_removes_student_from_activity(client):
     # Arrange
     activity_name = "Chess Club"
